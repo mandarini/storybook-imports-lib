@@ -5,11 +5,14 @@
     "nextapp": "apps/nextapp",
     "nextapp-e2e": "apps/nextapp-e2e",
     "nextlib": "libs/nextlib",
+    "nextlib-e2e": "apps/nextlib-e2e",
     "ngapp": "apps/ngapp",
     "ngapp-e2e": "apps/ngapp-e2e",
     "nglib": "libs/nglib",
+    "nglib-e2e": "apps/nglib-e2e",
     "reactapp": "apps/reactapp",
     "reactapp-e2e": "apps/reactapp-e2e",
-    "reactlib": "libs/reactlib"
+    "reactlib": "libs/reactlib",
+    "reactlib-e2e": "apps/reactlib-e2e"
   }
 }
