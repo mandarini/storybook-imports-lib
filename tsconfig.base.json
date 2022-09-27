@@ -14,7 +14,11 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@addons-imports/nextlib": ["libs/nextlib/src/index.ts"],
+      "@addons-imports/nglib": ["libs/nglib/src/index.ts"],
+      "@addons-imports/reactlib": ["libs/reactlib/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

@@ -1,0 +1,23 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/nglib/src",
+  "prefix": "addons-imports",
+  "targets": {
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/nglib"],
+      "options": {
+        "jestConfig": "libs/nglib/jest.config.ts",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["libs/nglib/**/*.ts", "libs/nglib/**/*.html"]
+      }
+    }
+  },
+  "tags": []
+}
