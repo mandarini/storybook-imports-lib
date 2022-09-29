@@ -1,12 +1,12 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import styles from './app.module.css';
 import NxWelcome from './nx-welcome';
+import { Four } from '@addons-imports/nextlib';
 
 export function App() {
   return (
     <>
       <NxWelcome title="reactapp" />
       <div />
+      <Four />
     </>
   );
 }
