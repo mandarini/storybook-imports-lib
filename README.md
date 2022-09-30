@@ -1,94 +1,76 @@
+# Storybook React Next.js issue
 
+The issue started on v.14.7.6. Versions before that work fine.
 
-# AddonsImports
+## Issue description
 
-This project was generated using [Nx](https://nx.dev).
+Storybook with Next.js needs the following of addons to work:
 
-<p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="450"></p>
+- `storybook-addon-next`
+- `storybook-addon-swc`
+- `@nrwl/react/plugins/storybook`
 
-🔎 **Smart, Fast and Extensible Build System**
+You can see these addons defined in the [`apps/nextapp/.storybook/main.js`](apps/nextapp/.storybook/main.js) file.
 
-## Adding capabilities to your workspace
+Starting with version 14.7.6, the `@nrwl/react/plugins/storybook` creates an issue on the `storybook-addon-next` addon.
 
-Nx supports many plugins which add capabilities for developing different types of applications and different tools.
+This results in a broken build, and Storybook cannot be started (or built).
 
-These capabilities include generating applications, libraries, etc as well as the devtools to test, and build projects as well.
+The error happens on line 21 of the following file in the `storybook-addon-next` repository:
 
-Below are our core plugins:
+[storybook-addon-next/src/images/webpack.ts](https://github.com/RyanClementsHax/storybook-addon-next/blob/main/src/images/webpack.ts):
 
-- [React](https://reactjs.org)
-  - `npm install --save-dev @nrwl/react`
-- Web (no framework frontends)
-  - `npm install --save-dev @nrwl/web`
-- [Angular](https://angular.io)
-  - `npm install --save-dev @nrwl/angular`
-- [Nest](https://nestjs.com)
-  - `npm install --save-dev @nrwl/nest`
-- [Express](https://expressjs.com)
-  - `npm install --save-dev @nrwl/express`
-- [Node](https://nodejs.org)
-  - `npm install --save-dev @nrwl/node`
+```
+  assetRule.test = /\.(apng|eot|otf|ttf|woff|woff2|cur|ani|pdf)(\?.*)?$/
+```
 
-There are also many [community plugins](https://nx.dev/community) you could add.
+`assetRule` is undefined, so it throws an error.
 
-## Generate an application
+<details>
+  <summary>Click here to view the full error log</summary>
 
-Run `nx g @nrwl/react:app my-app` to generate an application.
+```
+nx storybook nextapp
 
-> You can use any of the plugins above to generate applications as well.
+> nx run nextapp:storybook
 
-When using Nx, you can create multiple applications and libraries in the same workspace.
+info @storybook/react v6.5.12
+info
+info => Loading presets
+info Addon-docs: using MDX1
+=> Loading Nrwl React Storybook preset from "@nrwl/react/plugins/storybook"
 
-## Generate a library
+info => Ignoring cached manager due to change in manager config
+ERR! TypeError: Cannot set properties of undefined (setting 'test')
+ERR!     at configureStaticImageImport (/Users/katerina/Projects/nrwl/test_nx_workspaces/addons-imports/node_modules/storybook-addon-next/dist/images/webpack.js:21:20)
+ERR!     at configureImages (/Users/katerina/Projects/nrwl/test_nx_workspaces/addons-imports/node_modules/storybook-addon-next/dist/images/webpack.js:8:5)
+ERR!     at /Users/katerina/Projects/nrwl/test_nx_workspaces/addons-imports/node_modules/storybook-addon-next/dist/preset.js:32:35
+ERR!     at Generator.next (<anonymous>)
+ERR!     at fulfilled (/Users/katerina/Projects/nrwl/test_nx_workspaces/addons-imports/node_modules/tslib/tslib.js:115:62)
+ERR!  TypeError: Cannot set properties of undefined (setting 'test')
+ERR!     at configureStaticImageImport (/Users/katerina/Projects/nrwl/test_nx_workspaces/addons-imports/node_modules/storybook-addon-next/dist/images/webpack.js:21:20)
+ERR!     at configureImages (/Users/katerina/Projects/nrwl/test_nx_workspaces/addons-imports/node_modules/storybook-addon-next/dist/images/webpack.js:8:5)
+ERR!     at /Users/katerina/Projects/nrwl/test_nx_workspaces/addons-imports/node_modules/storybook-addon-next/dist/preset.js:32:35
+ERR!     at Generator.next (<anonymous>)
+ERR!     at fulfilled (/Users/katerina/Projects/nrwl/test_nx_workspaces/addons-imports/node_modules/tslib/tslib.js:115:62)
 
-Run `nx g @nrwl/react:lib my-lib` to generate a library.
+WARN Broken build, fix the error above.
+...
+```
 
-> You can also use any of the plugins above to generate libraries as well.
+</details>
 
-Libraries are shareable across libraries and applications. They can be imported from `@addons-imports/mylib`.
+## Potential causes
 
-## Development server
+It seems that [this commit](https://github.com/nrwl/nx/commit/f49769a34a7f47d252648132793cddd2612262ee), and specifically the changes to the file [packages/react/plugins/storybook/index.ts](https://github.com/nrwl/nx/blame/master/packages/react/plugins/storybook/index.ts), might be the cause of the issue. It looks like the function `getBaseWebpackPartial` changed, which affected the webpack output, which is potentially used by the `storybook-addon-next` addon. [Here is the previous version of the `getBaseWebpackPartial` function](https://github.com/nrwl/nx/commit/f49769a34a7f47d252648132793cddd2612262ee#diff-819766eb87503fdfe9cdcdcec25f3c4fc4f0d15ff1fa422b8e465c9dcbcbe26dL17).
 
-Run `nx serve my-app` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
+## Steps to reproduce
 
-## Code scaffolding
+1. `yarn` to install dependencies
+2. `nx storybook nextapp` to start Storybook
 
-Run `nx g @nrwl/react:component my-component --project=my-app` to generate a new component.
+### Verify that previous version of Nx works
 
-## Build
-
-Run `nx build my-app` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `nx test my-app` to execute the unit tests via [Jest](https://jestjs.io).
-
-Run `nx affected:test` to execute the unit tests affected by a change.
-
-## Running end-to-end tests
-
-Run `nx e2e my-app` to execute the end-to-end tests via [Cypress](https://www.cypress.io).
-
-Run `nx affected:e2e` to execute the end-to-end tests affected by a change.
-
-## Understand your workspace
-
-Run `nx graph` to see a diagram of the dependencies of your projects.
-
-## Further help
-
-Visit the [Nx Documentation](https://nx.dev) to learn more.
-
-
-
-## ☁ Nx Cloud
-
-### Distributed Computation Caching & Distributed Task Execution
-
-<p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-cloud-card.png"></p>
-
-Nx Cloud pairs with Nx in order to enable you to build and test code more rapidly, by up to 10 times. Even teams that are new to Nx can connect to Nx Cloud and start saving time instantly.
-
-Teams using Nx gain the advantage of building full-stack applications with their preferred framework alongside Nx’s advanced code generation and project dependency graph, plus a unified experience for both frontend and backend developers.
-
-Visit [Nx Cloud](https://nx.app/) to learn more.
+1. `git checkout test/v14-7-5`
+2. `yarn` to install dependencies
+3. `nx storybook nextapp` to start Storybook
